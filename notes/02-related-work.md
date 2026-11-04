@@ -1,0 +1,9 @@
+# 2. Background and Related Work — Analiz Notları
+
+Dependency Injection (DI), bağımlılıkların dışarıdan sağlanmasını esas alan ve Dependency Inversion Principle (DIP) ile ilişkili bir mekanizmadır. Inversion of Control (IoC), kontrolün belirli sorumluluklarının dışarıya devredilmesini ifade ederken DI container, DI framework'ü kapsamında bağımlılıkların çalışma zamanında oluşturulması ve sağlanmasını yönetebilen bileşendir. Bölümde sunulan kavramsal tanımlar, ilerleyen aşamalarda incelenen DI anti-pattern'lerinin anlaşılması için teknik bir temel oluşturmaktadır.(Tablo 1)
+
+İlgili çalışmalar, DI'ın farklı boyutlarını ele almaktadır. **Yang vd. (2008)**, Java projelerindeki DI kullanım biçimlerini; **Crasso vd. (2010)**, DI'ın web servis geliştirmedeki yararlarını ve maliyetlerini; **Razina ve Janzen (2007)** ise DI kullanımı ile *coupling* ve *cohesion* arasındaki ilişkiyi incelemiştir.
+
+Razina ve Janzen'in bulgularında, DI kullanımının her durumda daha düşük *coupling* veya daha yüksek *cohesion* sağladığını gösteren tutarlı bir eğilim ortaya konulamamıştır. Bu sonuç, DI'ın etkisizliğini kanıtlamamakla birlikte, kullanımının tek başına istenen yapısal kaliteyi garanti etmediğine işaret etmektedir. DI'ın etkisinin uygulama biçimi ve sistemin özellikleri gibi koşullarla ilişkili olabileceği değerlendirilmelidir.
+
+Bölümde ele alınan *code smell* ve *anti-pattern* katalogları da yazılımın yapısal problemlerini tanımlamak açısından bir temel sunmaktadır. Bununla birlikte, yazarların literatür değerlendirmesine göre mevcut çalışmalar DI'ın hatalı kullanımlarını sistematik ve kapsamlı biçimde incelememektedir. Dolayısıyla bu bölüm, DI kullanımının varlığını araştırmanın ötesine geçilerek **nasıl uygulandığının incelenmesi gerektiğini** ortaya koymakta ve önerilen DI anti-pattern kataloğunun araştırma gerekçesini desteklemektedir.

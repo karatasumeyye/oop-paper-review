@@ -1,0 +1,12 @@
+# 3. Catalog Proposal — Analiz Notları
+
+Yazarlar, yeni bir DI anti-pattern kataloğu önermeden önce mevcut çalışmaları inceleyerek literatürdeki eksiklikleri belirlemiştir. Genel *code smell* kataloglarının doğrudan DI kullanımından kaynaklanan problemlere odaklanmadığı; Seemann ve Roubtsov vd. tarafından önerilen yaklaşımların ise DI'a özgü problemleri kapsama bakımından sınırlı kaldığı değerlendirilmektedir. Bu inceleme, yeni bir katalog oluşturulmasının teorik gerekçesini desteklemektedir.
+
+Kataloğun geliştirilmesinde Java tercih edilmiştir. Dilin yaygın kullanımı, DI framework desteği ve açık kaynak projelerin erişilebilirliği bu tercihi gerekçelendirmektedir. Bununla birlikte, Java üzerinde belirlenen anti-pattern'lerin C# ve Python gibi farklı programlama dillerine genellenebilirliği henüz ampirik olarak doğrulanmış değildir. Bu durum, gelecekte yapılabilecek karşılaştırmalı araştırmalar açısından bir fırsat oluşturmaktadır.
+
+Anti-pattern adaylarının belirlenmesinde **tümevarımsal (inductive)** ve **tümdengelimsel (deductive)** yaklaşımlar birlikte kullanılmıştır. Tümevarımsal yaklaşımda gerçek yazılım projelerinde gözlemlenen DI problemlerinden, tümdengelimsel yaklaşımda ise SOLID ve GRASP tasarım prensiplerinden hareket edilmiştir. Bu yöntemlerin birlikte kullanılması, kataloğun hem pratik gözlemlere hem de teorik temellere dayanması açısından güçlü bir tercihtir. **Ancak bir tasarım prensibinin ihlal edilmesi, tek başına ölçülebilir bir yazılım kalitesi problemi bulunduğunu kanıtlamamaktadır. Bu nedenle önerilen anti-pattern'lerin geçerliliğinin sonraki aşamalarda değerlendirilmesi önemlidir.**
+
+Tümevarımsal gözlemlerin üç kapalı kaynak Java projesinde gerçekleştirilen yedi aylık bakım deneyimine dayanması, çalışmanın endüstriyel uygulamalardan beslenmesini sağlamaktadır. Bununla birlikte, proje sayısının sınırlı olması ve kaynak kodların gizlilik nedeniyle paylaşılamaması, başlangıç gözlemlerinin temsil gücü ve bağımsız doğrulanabilirliği açısından sınırlılık oluşturmaktadır. Bu sınırlılıkların sonraki ampirik değerlendirmelerle ne ölçüde giderildiği ayrıca incelenmelidir.
+
+Genel olarak bölüm, önerilen kataloğun oluşturulma gerekçesini ve yöntemsel temelini ortaya koymaktadır. **Araştırmanın güçlü yönü, teorik tasarım prensipleriyle gerçek proje gözlemlerini birleştirmesidir.** Bununla birlikte, belirlenen anti-pattern adaylarının gerçek tasarım problemlerini ne ölçüde temsil ettiği ve farklı yazılım ortamlarına uygulanabilirliği, çalışmanın sonraki bulgularıyla birlikte değerlendirilmelidir.
+
