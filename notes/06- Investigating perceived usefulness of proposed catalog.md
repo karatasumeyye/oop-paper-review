@@ -1,0 +1,9 @@
+### 6. Investigating Perceived Usefulness of Proposed Catalog —  Değerlendirme
+
+Önerilen DI anti-pattern kataloğunun deneyimli geliştiriciler üzerinden değerlendirilmesi, çalışmanın pratik yararlılığını araştırması açısından önemli bir katkıdır. Görüşmeler ve çevrim içi anketler aracılığıyla farklı bakış açılarının toplanması, katalogdaki problemlerin yalnızca teorik tasarım ilkelerine dayanarak değerlendirilmesini önlemektedir.
+
+Bununla birlikte, katılımcıların bazı anti-pattern'lere yönelik koşullu değerlendirmeleri, tasarım problemlerinin uygulama bağlamından bağımsız ele alınamayacağını göstermektedir. Özellikle mimari gereksinimler, sistemin ölçeği ve refactoring maliyetleri, belirli bir kod örüntüsünün problemli kabul edilmesinde etkili olabilir. Bu nedenle anti-pattern tespitinin ardından bağlamsal değerlendirme yapılması, kataloğun uygulanabilirliğini artırabilir.
+
+Ayrıca geliştiricilerin kataloğu yararlı bulması ve refactoring yapmaya istekli olması, önerilen dönüşümlerin gerçek projelerde uygulanacağını veya yazılım kalitesini iyileştireceğini doğrudan kanıtlamamaktadır. Bu ayrımın değerlendirilmesi için gerçek geliştirme süreçlerinde alınan refactoring kararlarının ve sonrasında oluşan kalite değişimlerinin incelenmesi önerilebilir.
+
+Katılımcıların bütün anti-pattern'lere aynı düzeyde yaklaşmaması, kataloğun **bağlama bağımlılık, olası etki ve refactoring önceliği** açısından sınıflandırılarak geliştirilebileceğini düşündürmektedir. Bunun yanında katılımcı geri bildirimlerinin kataloğun güncellenmesinde kullanılması, çalışmanın yalnızca mevcut önerileri doğrulamaya değil, bunları iyileştirmeye de yöneldiğini göstermektedir.
