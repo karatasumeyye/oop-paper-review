@@ -1,0 +1,9 @@
+## 8. Threats to Validity — Geçerliliğe Yönelik Tehditler
+
+Yazarlar, araştırmanın sınırlılıklarını *Internal Validity, External Validity, Construct Validity ve Reliability* başlıkları altında değerlendirmiştir. Anketlerde oluşabilecek yanlılıklar, DIAnalyzer'ın bazı anti-pattern örneklerini tespit edememe olasılığı, katılımcıların özellikleri ve incelenen projelerin Java ekosistemiyle sınırlı olması temel tehditler arasındadır. Bu riskleri azaltmak amacıyla bağımsız araştırmacı doğrulaması, precision ve relative recall ölçümleri ile anket materyallerinin gözden geçirilmesi gibi yöntemler kullanılmıştır.
+
+Çalışmanın güçlü yönlerinden biri, geçerliliğe yönelik tehditlerin açıkça belirtilmesi ve bunları azaltmaya yönelik önlemlerin açıklanmasıdır. Bununla birlikte, alınan önlemler bütün sınırlılıkları ortadan kaldırmamaktadır. Özellikle kural tabanlı tespit yaklaşımının mimari bağlamı değerlendirmedeki sınırları ve araştırma bulgularının farklı programlama ekosistemlerine genellenebilirliği dikkate alınmalıdır.
+
+Ayrıca DIAnalyzer'ın değerlendirilmesinde kullanılan referans veri setinde CPM örneklerinin bulunmaması, bu anti-pattern'e yönelik tespit başarısının yeterince doğrulanamaması açısından önemli bir sınırlılık olarak değerlendirilebilir. Doğrulanmış CPM örneklerini içeren ek veri setleriyle yapılacak testler, aracın güvenilirliğinin daha kapsamlı değerlendirilmesini sağlayabilir.
+
+Son olarak, geliştiricilerin kataloğa yönelik olumlu görüşlerinin ve refactoring istekliliğinin gerçek yazılım kalitesi iyileşmeleriyle eşdeğer olmadığı unutulmamalıdır. Bu nedenle gelecekteki çalışmalarda gerçek projelerde uygulanan refactoring işlemlerinin sonuçlarının ölçülmesi, araştırmanın bulgularını güçlendirebilir.
