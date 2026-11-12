@@ -320,3 +320,315 @@ Güncellenen katalogda anti-pattern’ler Design, Architecture, Performance ve S
 mak üzere dört kategoride sınıflandırılmıştır. Bu sınıflandırma, problemlerin yalnızca sınıf düzeyindeki
 tasarım kararlarıyla sınırlı olmadığını; mimari bağımlılıklar, performans ve standartlaşma açısından da
 değerlendirildiğini göstermektedir.
+
+
+4.2 SeçilmişAnti-Pattern’lerinOOPAçısındanİncelenmesi
+Katalogdatanımlanananti-pattern’lerinnesneyönelimlitasarımilkeleriyleilişkisinisomutlaştırmak
+amacıylaConcreteClassInjection(CCI)veDirectContainerCall (DCC)örnekleri incelenmiştir.Kod
+örnekleri,güncellenmişkatalogdakiilgilişekillerdensadeleştirilerekuyarlanmıştır.
+4.2.1 ConcreteClassInjection(CCI)
+CCI,birsınıfınbağımlılığınısoyutlamayerinedoğrudansomutsınıfüzerindentanımlamasıylaor
+tayaçıkmaktadır.
+1 public class B {
+2 @Inject
+3 private ConcreteClassExample example;
+4
+5 public void foo() {
+6 example.doSomething();
+7 }
+8 }
+Kod1:CCI:Problemlikodyapısı
+BuörnekteBsınıfı,bağımlılığınıDIaracılığıylaalmasınarağmendoğrudanConcreteClassExample
+sınıfınabağlıdır.Budurum,bağımlılığındışarıdansağlanmasınıntekbaşınauygunbirsoyutlamaoluş
+turmadığınıgöstermektedir.
+1 public interface IExampleInterface {
+2 void doSomething();
+3 }
+4
+5 public class ConcreteClassExample
+6 implements IExampleInterface {
+7
+8 public void doSomething() {
+9 // Implementation
+10 }
+11 }
+12
+13 public class B {
+14 @Inject
+15 private IExampleInterface example;
+16
+17 public void foo() {
+18 example.doSomething();
+19 }
+20 }
+Kod2:CCI:Refactoringsonrasıkodyapısı
+RefactoringsonrasındaBsınıfınınbağımlılığısomutsınıftanIExampleInterfacearayüzünetaşınmış
+tır.Böylecesınıf,belirlibiruygulamayerineortakbirdavranışsözleşmesinebağımlıhâlegelmiştir.
+7
+OOP açısından değerlendirildiğinde, bu dönüşüm özellikle Dependency Inversion Principle
+(DIP), abstraction ve polymorphism kavramlarıyla ilişkilidir. DI, bağımlılığın sınıfa nasıl sağlandı
+ğını düzenlerken DIP, bağımlılığın uygun soyutlamalara yönelmesini esas almaktadır. Bu nedenle DI
+kullanılması, tek başına DIP ilkesinin uygulandığı anlamına gelmemektedir.
+Refactoring sonrasında soyutlama üzerinden kurulan bağımlılık, farklı uygulamaların kullanılma
+sını ve testlerde alternatif gerçekleştirimlerin sağlanmasını kolaylaştırabilir. Bununla birlikte, her somut
+sınıf için interface oluşturmak zorunlu değildir; sağlanacak fayda sistemin ihtiyaçlarına göre değerlendi
+rilmelidir.
+4.2.2 Direct Container Call (DCC)
+1 public class F {
+DCC, uygulama sınıfının ihtiyaç duyduğu bağımlılığı doğrudan DI container üzerinden elde etmesi
+durumunda ortaya çıkmaktadır.
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14 }
+@Inject
+private ApplicationContext context;
+protected IDataSource getRepository() {
+return (IDataSource)
+context.getBean("ftpDataSource");
+}
+public void execute() {
+IDataSource dataSource = getRepository();
+// Use dataSource
+}
+Kod 3: DCC: Problemli kod yapısı
+Bu örnekte F sınıfı, bağımlılığının sağlanması için doğrudan Spring ApplicationContext API’sini
+kullanmaktadır. Böylece sınıf, yalnızca IDataSource hizmetine değil, bağımlılığın container üzerinden
+nasıl elde edildiğine de bağlı hâle gelmektedir.
+1 public class F {
+2
+3
+4
+5
+6
+7
+8 }
+@Inject
+private IDataSource dataSource;
+public void execute() {
+// Use dataSource
+}
+Kod 4: DCC: Refactoring sonrası kod yapısı
+Refactoring sonrasında container çağrısı uygulama sınıfından kaldırılmış ve IDataSource bağımlılığı
+doğrudan enjeksiyon yoluyla sağlanmıştır. Böylece F sınıfı, bağımlılığı arama sorumluluğunu üstlenme
+den yalnızca kendisine sağlanan nesneyi kullanmaktadır.
+OOP açısından değerlendirildiğinde, bu dönüşüm Inversion of Control (IoC) ve Low Coupling
+ilkeleriyle ilişkilidir. Bağımlılığın sağlanma sorumluluğunun uygulama sınıfından ayrılması, sınıfın con
+tainer API’sine olan bağımlılığını azaltır. Ancak çalışma zamanında dinamik bağımlılık çözümlemesi
+gereken sistemlerde doğrudan enjeksiyon her zaman yeterli olmayabilir. Bu tür durumlarda container
+erişiminin ayrı bir Provider bileşeninde kapsüllenmesi değerlendirilebilir.
+Kaynak: Laigner vd., Catalog of Java Dependency Injection Anti-Patterns[2], Şekil 1 ve Şekil 8’den uyarlanmıştır.
+8
+4.3 DIAnalyzer ve Gerçek Projelerdeki Bulgular
+DIAnalyzer’ın değerlendirilmesinde, araştırmacılar tarafından Agilefant ve LibrePlan projelerindeki
+83 sınıf üzerinden manuel olarak oluşturulan referans veri kümesi kullanılmıştır. Araç, bu kümede belir
+lenen 141 anti-pattern örneğinin 130’unu tespit ederek %92,19 relative recall değerine ulaşmıştır. Proje
+bazındaki ortalama precision sonuçları ise Agilefant için %97,78, LibrePlan için %89,80 olarak bildiril
+miştir [1].
+Bu ölçütlerden precision, araç tarafından raporlanan örneklerin ne kadarının doğru olduğunu değer
+lendirmektedir. Relative recall ise manuel referans kümesindeki örneklerin ne kadarının araç tarafından
+tespit edilebildiğini göstermektedir. Dolayısıyla raporlanan relative recall, tüm projelerdeki olası anti
+pattern örneklerini kapsayan mutlak bir başarı ölçümü olarak yorumlanmamalıdır.
+Tablo 4: DIAnalyzer doğrulama sonuçları
+Ölçüt
+Referans veri kümesindeki sınıf sayısı
+Manuel belirlenen anti-pattern örneği
+DIAnalyzer tarafından tespit edilen örnek
+Relative recall
+Agilefant ortalama precision
+LibrePlan ortalama precision
+Sonuç
+83
+141
+130
+%92,19
+%97,78
+%89,80
+Kaynak: Laigner vd. (2022) [1], Tablo 7 ve Bölüm 5.2.
+Araçla gerçekleştirilen proje incelemelerinde anti-pattern türlerinin görülme sıklığının projeler ara
+sında farklılık gösterdiği raporlanmıştır. Buna karşılık CPM anti-pattern’ine incelenen altı projede de
+rastlanmamıştır.
+Ancak projelerin büyüklükleri ve kullandıkları DI framework’leri farklı olduğundan, ham tespit
+sayıları doğrudan yazılım kalitesi karşılaştırması olarak değerlendirilmemelidir.
+Ayrıca precision ve relative recall değerleri aracın tespit başarısını göstermektedir. Bu sonuçlar, tes
+pit edilen her kod yapısının yazılım kalitesini olumsuz etkilediğini tek başına kanıtlamamaktadır.
+4.4 Geliştirici Değerlendirmeleri ve Sonuçların Yorumlanması
+Geliştirici görüşmeleri ve anketler, önerilen kataloğa yönelik genel olarak olumlu bir değerlendirme
+ortaya koymuştur. Üç deneyimli geliştiriciyle gerçekleştirilen ilk görüşme aşamasında, toplam 39 değer
+lendirmenin 37’sinde tam veya kısmi kabul bildirilmiştir. Altı uzman geliştiricinin katıldığı çevrim içi
+ankette ise 36 TAM yanıtının 31’i olumlu yönde olmuştur [1]. Burada belirtilen 39 ve 36 değerleri katı
+lımcı sayılarını değil, değerlendirme ve yanıt sayılarını ifade etmektedir. Bu nedenle bulgular, katılımcı
+sayısı ve araştırmanın kapsamı dikkate alınarak yorumlanmalıdır.
+Bununla birlikte, geliştiricilerin refactoring konusundaki tutumları anti-pattern türlerine göre fark
+lılık göstermiştir. Bildirilen refactoring istekliliği, anti-pattern türüne ve katılımcıların uygulama bağla
+mına ilişkin değerlendirmelerine göre değişmiştir. Bu nedenle anket yanıtları, bütün geliştiricilere genel
+lenebilecek kesin refactoring oranları olarak yorumlanmamalıdır.
+Bufarklılıklar, önerilen çözümlerin her yazılım sistemi için aynı ölçüde gerekli veya yararlı olmaya
+bileceğini göstermektedir. Özellikle maliyetli bağımlılıkların gecikmeli oluşturulması, ek soyutlamaların
+kullanılması ve framework bağımlılıklarının azaltılması gibi kararlarda sistemin gereksinimlerinin dik
+kate alınması önem taşımaktadır.
+Araştırmada elde edilen geliştirici görüşleri, kataloğun algılanan yararlılığı ve refactoring istekli
+liği hakkında bilgi sunmaktadır. Ancak bu değerlendirmeler, önerilen değişikliklerin gerçek projelerde
+9
+uygulanmasının ardından yazılım kalitesinde ölçülebilir bir iyileşme meydana geldiğini doğrudan göster
+memektedir.
+5 Nesne Yönelimli Programlamayla İlişkisi
+Laigner ve arkadaşlarının (2022)[1] çalışması, Dependency Injection mekanizmasının yalnızca ba
+ğımlılıkların sağlanmasıyla ilgili teknik bir yaklaşım olmadığını, nesne yönelimli tasarım ilkeleriyle bir
+likte değerlendirilmesi gerektiğini ortaya koymaktadır. Makalede tanımlanan anti-pattern’ler, DI kulla
+nımına rağmen sınıflar arasında sıkı bağlılık, sorumlulukların uygun olmayan biçimde dağıtılması ve
+kapsülleme problemleri oluşabileceğini göstermektedir.
+Özellikle Concrete Class Injection (CCI), soyutlama yerine somut sınıflara bağımlılığın Dependency
+Inversion Principle (DIP) ile ilişkisini ortaya koymaktadır. Fat DI Class (FDC) ve Complex Producer Met
+hod (CPM) ise Single Responsibility Principle (SRP) ile GRASP’ın High Cohesion ve Low Coupling
+ilkeleri açısından değerlendirilebilmektedir. Bu örnekler, sınıfların ve metotların üstlendikleri sorumlu
+lukların bağımlılık yönetiminden ayrı düşünülemeyeceğini göstermektedir.
+Open Window Injection (OWI) ve Open Door Injection (ODI), nesnelerin iç bağımlılıklarının dışa
+rıya açılması veya dışarıdan değiştirilmesi nedeniyle kapsülleme (encapsulation) ilkesiyle ilişkilidir. Sta
+tic Dependence Provider (SDP) ve Direct Container Call (DCC) ise bağımlılıkların doğrudan uygulama
+kodu tarafından elde edilmesi nedeniyle Inversion of Control (IoC) ve düşük bağlılık hedefleri açısından
+önem taşımaktadır.
+Bu ilişkiler değerlendirildiğinde, DI mekanizmasının kullanılmasının tek başına düşük coupling
+veya yüksek cohesion sağlamadığı anlaşılmaktadır. Bağımlılıkların nasıl tanımlandığı, hangi bileşenlere
+verildiği ve sınıfların sorumluluklarıyla nasıl ilişkilendirildiği de tasarım kalitesini etkilemektedir.
+Bununla birlikte, nesne yönelimli tasarım ilkelerinin her durumda katı kurallar olarak uygulanması
+da uygun değildir. Örneğin yalnızca somut bir sınıfa bağımlılık bulunması, her koşulda yeni bir interface
+oluşturulmasını gerektirmemektedir. Kataloğun geliştirici geri bildirimleri doğrultusunda güncellenmesi
+de tasarım problemlerinin uygulamanın büyüklüğü, mimari gereksinimleri ve kullanım bağlamıyla bir
+likte değerlendirilmesi gerektiğini desteklemektedir.
+Bu yönüyle çalışma, bağımlılık sağlama mekanizması ile nesne yönelimli tasarım kararlarının ayrı
+ancak birbiriyle ilişkili konular olduğunu vurgulamaktadır.
+
+6 Temel Kaynaklar ve Alanın Tarihsel Gelişimi
+Dependency Injection (DI) üzerine yapılan araştırmalar, mekanizmanın yazılım kalitesi üzerindeki
+etkilerinin incelenmesinden farklı uygulama alanlarında kullanılmasına ve hatalı kullanım biçimlerinin
+araştırılmasına doğru genişlemiştir. Laigner vearkadaşlarının (2022)çalışmasınınliteratürdeki konumunu
+değerlendirmek amacıyla, makalenin kaynakçasında yer alan üç temel araştırma incelenmiştir.
+Razina ve Janzen (2007)[3], Effects of Dependency Injection on Maintainability çalışmalarında,
+DI’ın yazılımın bakım yapılabilirliğini artırdığı yönündeki teorik beklentiyi ampirik olarak sınamıştır.
+Araştırmada 20’si Spring kullanan, 20’si kullanmayan toplam 40 açık kaynak proje, coupling ve cohesion
+metrikleri üzerinden karşılaştırılmıştır. Sonuçlarda DI kullanımı ile bu metrikler arasında genel bir ilişki
+doğrulanamamış,ancakDIkullanımoranı%10’unüzerindeolanprojelerdedahadüşükcouplingyönünde
+bir eğilim gözlemlenmiştir. Bu çalışma, DI’ın beklenen tasarım faydalarının gerçek projelerde ölçülmesi
+bakımından erken dönem araştırmalardan birini temsil etmektedir.
+Crasso ve arkadaşları (2010)[4], Empirically Assessing the Impact of DI on the Development of
+Web Service Applications çalışmalarında, DI araştırmalarını web servis tabanlı uygulama geliştirme ala
+10
+nına taşımıştır. DI ve Adapter tasarım örüntüsünü birleştiren DI4WS yaklaşımı geliştirilerek servis keşfi
+başarısı ve kaynak tüketimi deneysel olarak incelenmiştir. Elde edilen bulgular, incelenen koşullarda ser
+vis keşfinin iyileştirilebildiğini, ancak ek işlem ve bellek maliyetlerinin de oluşabildiğini göstermiştir.
+Böylece araştırma odağı, DI’ın genel kalite etkisinin ölçülmesinden belirli uygulama alanlarında sağla
+dığı faydaların ve maliyetlerin değerlendirilmesine genişlemiştir.
+Aynı dönemde Roubtsov ve arkadaşları (2010)[5], Detecting Modularity Smells in Dependencies
+Injected with Java Annotations çalışmalarında, DI kullanımının sağlayabileceği faydalardan farklı olarak,
+hatalı uygulamaların oluşturabileceği tasarım problemlerine odaklanmıştır. Java anotasyonlarının modü
+lerlik ilkeleriyle çelişebilecek kullanım biçimleri incelenmiş; yapılandırma bilgilerinin işlevsel kodla ka
+rışması, bilgi tekrarı ve örtük bağımlılıklar gibi problemler sınıflandırılmıştır. Çalışmada bu problemlere
+yönelik bir katalog ve çözüm önerileri sunulmuş, ancak bunların gerçek projelerdeki yaygınlığı kapsamlı
+bir ampirik analizle değerlendirilmemiştir. Bu araştırma, DI’ın yalnızca sağladığı avantajların değil, yan
+lış kullanımından doğabilecek tasarım sorunlarının da incelenmeye başlandığını göstermektedir.
+Bu çalışmalar, DI araştırmalarının farklı yönlerini ortaya koymaktadır. İlk araştırmalarda DI’ın ya
+zılım kalitesine ve geliştirme süreçlerine katkısı sorgulanırken, sonraki çalışmalarda mekanizmanın nasıl
+kullanıldığı ve hangi koşullarda tasarım problemleri oluşturabileceği de araştırma konusu hâline gelmiş
+tir. Bununla birlikte, bu çalışmalar DI kötü uygulamalarının kapsamlı biçimde tanımlanması ve gerçek
+sistemlerde değerlendirilmesi konusunda sınırlı kalmıştır.
+Bu araştırma birikimi üzerinde yükselen Laigner ve arkadaşları, 2019 yılında Java DI anti
+pattern’lerine yönelik bir katalog önerisi sunmuş[6], 2022 yılındaki çalışmalarında ise bu yaklaşımı
+genişleterek 12 anti-pattern içeren bir katalog geliştirmiştir. Önceki araştırmalardan farklı olarak DI
+Analyzer adlı statik analiz aracıyla anti-pattern’lerin gerçek projelerdeki varlığı incelenmiş ve geliştirici
+görüşleri doğrultusunda katalog güncellenmiştir.
+Dolayısıyla alanın gelişimi, DI’ın olası faydalarının araştırılmasından kötü kullanım biçimlerinin
+tanımlanmasınave bunların sistematik olarak değerlendirilmesine uzanan bir araştırma genişlemesi olarak
+yorumlanabilir. Bununla birlikte, Laigner ve arkadaşlarının çalışması da anti-pattern’lerin giderilmesinin
+gerçek bakım maliyetine ve yazılım kalitesine etkisini doğrudan ölçmemektedir. Bu durum, gelecekteki
+araştırmalar için önemli bir çalışma alanı oluşturmaktadır.
+7 Eleştirel Değerlendirme ve Geliştirme Önerileri
+Laigner ve arkadaşlarının (2022) çalışmasının güçlü yönlerinden biri, Dependency Injection anti
+pattern’lerini yalnızca teorik tasarım ilkeleri üzerinden tanımlamakla sınırlı kalmayıp gerçek yazılım pro
+jeleri ve geliştirici görüşleri aracılığıyla değerlendirmesidir. Kataloğun tümevarımsal ve tümdengelimsel
+yaklaşımlar kullanılarak oluşturulması, hem endüstriyel gözlemlerin hem de nesne yönelimli tasarım ilke
+lerinin dikkate alınmasını sağlamıştır. Ayrıca DIAnalyzer aracının açık kaynak olarak sunulması, önerilen
+tespit yaklaşımının incelenebilmesi ve geliştirilebilmesi açısından önemli bir katkıdır.
+7.1 Araştırmanın Sınırlılıkları ve Bulguların Değerlendirilmesi
+Araştırmada dikkat edilmesi gereken temel ayrımlardan biri, anti-pattern tespit başarısı ile yazı
+lım kalitesi üzerindeki gerçek etkinin birbirinden farklı olmasıdır. DIAnalyzer’ın yüksek precision
+ve relative recall değerlerine ulaşması, belirlenen kod örüntülerinin tespit edilmesindeki başarısını destek
+lemektedir. Ancak bir kod örüntüsünün doğru tespit edilmesi, bu yapının yazılımın bakım maliyetini, de
+ğiştirilebilirliğini veya test edilebilirliğini olumsuz etkilediğini doğrudan kanıtlamamaktadır. Bu nedenle
+kataloğun geçerliliğinin yalnızca tespit sonuçlarıyla değil, söz konusu problemlerin yazılım kalitesine
+etkileriyle de değerlendirilmesi gerektiği düşünülmektedir.
+11
+Bir diğer sınırlılık, kural tabanlı statik analizin uygulama bağlamını değerlendirme kapasite
+sidir. Geliştirici geri bildirimleri sonucunda kataloğa Context alanının eklenmesi, belirli kod yapılarının
+her durumda tasarım problemi olarak kabul edilemeyeceğini göstermektedir. Örneğin küçük bir sistemde
+somut sınıfa bağımlılık kurulması veya çalışma zamanında dinamik bağımlılık çözümlemesi yapılması
+mimari gereksinimlerden kaynaklanabilir. Bununla birlikte, katalogdaki bu bağlamsal düzenlemelerin
+DIAnalyzer’ın tespit kurallarına ne ölçüde yansıtıldığı ayrıca değerlendirilmelidir. Bağlamın dikkate alın
+maması, bazı tespitlerin yanlış pozitif olarak değerlendirilmesine neden olabilir.
+Araştırmanın ampirik kapsamı açısından da bazı sınırlılıklar bulunmaktadır. İncelenen projelerin bü
+yüklükleri, mimari özellikleri ve kullandıkları DI framework’leri farklıdır. Dolayısıyla anti-pattern’lerin
+ham görülme sayılarının doğrudan karşılaştırılması, projelerin yapısal kalitesi hakkında yanıltıcı sonuç
+lar oluşturabilir. Proje büyüklüğü, sınıf sayısı veya enjeksiyon kullanılan bileşen sayısı gibi değişkenler
+dikkate alınarak yapılacak karşılaştırmaların daha anlamlı olabileceği değerlendirilmektedir.
+Ayrıca incelenen projelerde Complex Producer Method (CPM) örneğinin tespit edilmemesi ve oluş
+turulan referans veri kümesinde bu anti-pattern’e ait doğrulanmış örneklerin bulunmaması, ilgili tespit
+kuralının başarısının değerlendirilmesini sınırlandırmaktadır. Bu durum, CPM’nin geçersiz olduğu anla
+mına gelmemekle birlikte, aracın bu anti-pattern’e yönelik doğrulama kapsamının genişletilmesi gerekti
+ğini göstermektedir.
+Geliştirici görüşmeleri ve anketler, kataloğun algılanan yararlılığını değerlendirmesi açısından
+önemli olmakla birlikte katılımcı sayılarının sınırlı olması ve değerlendirmelerin kişisel görüşlere dayan
+ması, sonuçların genellenebilirliğini etkilemektedir. Daha önemlisi, geliştiricilerin refactoring yapmaya
+istekli olduklarını belirtmeleri, bu değişiklikleri gerçek projelerde uygulayacaklarını veya uygulama
+sonrasında yazılım kalitesinin iyileşeceğini garanti etmemektedir.
+7.2 Geliştirme Önerileri
+Çalışmanın geliştirilebileceği önemli alanlardan biri, anti-pattern’lerin zaman içerisindeki olu
+şum ve değişim süreçlerinin incelenmesidir. Makalede proje geçmişlerine yönelik sınırlı incelemeler
+bulunmakla birlikte, daha sistematik bir boylamsal analiz gerçekleştirilebilir. Git commit geçmişleri üze
+rinden anti-pattern’lerin hangi kod değişiklikleri, mimari kararlar veya bakım faaliyetleri sonucunda oluş
+tuğu araştırılabilir. Örneğin Useless Injection (USI) örneklerinin önceki refactoring işlemlerinden sonra
+kullanılmayan bağımlılıkların kaldırılmaması nedeniyle ortaya çıkıp çıkmadığı incelenebilir. Böylece yal
+nızca problemlerin varlığı değil, oluşum süreçleri de değerlendirilebilir.
+Bir diğer öneri, DIAnalyzer’ın refactoring kararlarını destekleyecek şekilde geliştirilmesidir.
+Mevcut katalogda farklı anti-pattern’ler için çözüm önerileri sunulsa da bu problemlerin giderilme mali
+yetleri ve olası etkileri aynı değildir. Örneğin kullanılmayan bir bağımlılığın kaldırılması ile çok sayıda
+sorumluluk üstlenen bir sınıfın yeniden yapılandırılması farklı düzeylerde değişiklik ve regresyon riski
+oluşturabilir. Bu nedenle tespit edilen anti-pattern’lerin olası kalite etkisi, bağlamsal geçerliliği, giderilme
+maliyeti ve önceliğine göre değerlendirilmesi geliştiricilere daha uygulanabilir bir rehberlik sağlayabilir.
+Önerilen refactoring işlemlerinin etkilerinin öncesi ve sonrası kalite ölçümleriyle değerlendiril
+mesi de araştırmayı güçlendirebilir. Coupling ve cohesion metriklerinin yanı sıra değişikliklerin kapsamı,
+test edilebilirlik ve bakım faaliyetlerine ilişkin göstergeler incelenebilir. Bununla birlikte, yalnızca metrik
+lerdeki değişimlerin değil, refactoring sırasında ortaya çıkan geliştirme maliyetinin ve olası yan etkilerin
+de dikkate alınması gerekmektedir.
+Son olarak, kataloğun Java dışındaki programlama ekosistemlerinde değerlendirilmesi önemli bir
+araştırma fırsatıdır. Özellikle C# ve Python gibi dillerde kullanılan bağımlılık yönetimi mekanizmaları
+farklılık göstermektedir. Bu nedenle DIAnalyzer’ın tespit kurallarının doğrudan aktarılması yerine, ilgili
+dillerin ve framework’lerin özelliklerine uygun kurallar geliştirilerek yeni veri kümeleri üzerinde doğru
+12
+lama yapılması önerilebilir.
+Genel olarak değerlendirildiğinde, çalışma DI kullanımındaki olası tasarım problemlerinin sistema
+tik biçimde incelenmesine önemli bir temel sağlamaktadır. Bununla birlikte, bir anti-pattern’in tespit
+edilmesi, mutlaka refactoring uygulanması gerektiği anlamına gelmemektedir. Tasarım kararlarının
+sistem gereksinimleri, bakım maliyeti ve beklenen kalite kazanımları birlikte değerlendirilerek verilmesi
+daha uygun bir yaklaşım olacaktır.
+8 Sonuç
+Bu raporda Laigner ve arkadaşlarının Dependency Injection anti-pattern’lerine ilişkin araştırması;
+amacı, yöntemi, önerdiği katalog, otomatik tespit bulguları ve geliştirici değerlendirmeleri açısından in
+celenmiştir. Çalışmanın temel katkısı, DI kullanımındaki olası tasarım problemlerini sistematik olarak
+tanımlaması ve bunları gerçek yazılım projelerinden ve uygulayıcı görüşlerinden elde edilen kanıtlarla
+değerlendirmesidir. Katalogdaki örnekler, DI mekanizmasının doğru nesne yönelimli tasarım kararla
+rının yerini alamayacağını; sorumluluk dağılımı, uygun soyutlamalar ve bağımlılık ilişkilerinin ayrıca
+değerlendirilmesi gerektiğini göstermektedir.
+Bununla birlikte aracın tespit başarısı, her anti-pattern’in gerçek bakımmaliyetineetkisini veyaöneri
+len refactoring’in sağlayacağı kalite kazanımını doğrudan ölçmemektedir. Bu nedenle kataloğun bağlam
+sal bir tasarım inceleme rehberi olarak kullanılması; gelecek çalışmalarda boylamsal analizler, refactoring
+öncesi ve sonrası kalite ölçümleri ve farklı programlama ekosistemlerinde doğrulamalarla geliştirilmesi
+uygun görülmektedir.
